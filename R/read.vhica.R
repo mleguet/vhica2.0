@@ -1,6 +1,6 @@
 read.vhica <-
 function (gene.fasta=NULL, target.fasta=NULL, cb.filename=NULL, div.filename=NULL, 
-	reference = "Gene", divergence = "dS", CUB.method="ENC", div.method="LWL85", div.pairwise=TRUE, div.max.lim=3, species.sep="_", gene.sep=".", family.sep=".", ...) 
+	reference = "Gene", divergence = "dS", CUB.method="ENC", div.method="LWL85", div.pairwise=TRUE, div.max.lim=3, species.sep="_", gene.sep=".", family.sep=".",coding=TRUE, ...) 
 {
 	stopifnot( 
 		!(is.null(gene.fasta) && is.null(target.fasta)) || 
@@ -20,12 +20,13 @@ function (gene.fasta=NULL, target.fasta=NULL, cb.filename=NULL, div.filename=NUL
 		vhica.obj$div <- .read.divergence(file = div.filename, divergence = divergence)    
     }
     vhica.obj$reg <- .reference.regression(vhica.obj$cbias, vhica.obj$div, 
-        reference = reference, divergence = divergence, family.sep=family.sep, ...)
+                                           reference = reference, divergence = divergence, family.sep=family.sep, ...)
     vhica.obj$reference <- reference
     tmp.target <- levels(vhica.obj$cbias[, "Type"])
     vhica.obj$target <- tmp.target[tmp.target != reference][1]
     vhica.obj$divergence <- divergence
     vhica.obj$family.sep=family.sep
+    vhica.obj$coding <- coding
     class(vhica.obj) <- c("vhica", class(vhica.obj))
     return(vhica.obj)
 }
