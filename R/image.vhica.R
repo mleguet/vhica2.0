@@ -25,7 +25,7 @@ function (x, element = "", H1.test = "lower", treefile = NULL,
         species <- species[species %in% tree$tip.label]
     }
     stats <- .stat.matrix(vhica.obj = x, element = element, elements = elements, 
-        p.adjust.method = p.adjust.method, H1.test = H1.test)
+        p.adjust.method = p.adjust.method, H1.test = H1.test,coding=x$coding)
     thresh <- NULL
     col.range <- c(-0.5, 0.5)
     if (H1.test != "greater") {
