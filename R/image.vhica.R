@@ -1,5 +1,5 @@
 image.vhica <-
-function (x, element = "", H1.test = "bilat", treefile = NULL, 
+function (x, element = "", H1.test = "lower", treefile = NULL, 
     skip.void = FALSE, species = NULL, p.threshold = 0.05, p.adjust.method = "bonferroni", 
     ncolors = 1024, main = element, threshcol = 0.1, colsqueeze=1, ...) 
 {
