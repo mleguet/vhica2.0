@@ -1,7 +1,7 @@
 image.vhica <-
 function (x, element = "", H1.test = "lower", treefile = NULL, 
     skip.void = FALSE, species = NULL, p.threshold = 0.05, p.adjust.method = "bonferroni", 
-    ncolors = 1024, main = element, threshcol = 0.1, colsqueeze=1, ...) 
+    ncolors = 1024, main = element, threshcol = 0.1, colsqueeze=1 , p.value.show=TRUE, ...) 
 {
     op <- par(no.readonly = TRUE)
     tree <- .prepare.phylo(treefile)
@@ -55,7 +55,7 @@ function (x, element = "", H1.test = "lower", treefile = NULL,
         frame()
     }
     .plot.matrix(pmatrix = stats, species = species, elements = elements, 
-        col.obj = cols, ...)
+        col.obj = cols, p.value.show=p.value.show, ...)
     layout(1)
     par(op)
     ans <- list(tree = tree, species = species, elements = elements, 
