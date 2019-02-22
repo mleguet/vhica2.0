@@ -1,12 +1,13 @@
-vhica_HTsummary <- function(TEName,imageObj,vhicaObj,DivRate=-1){
+vhica_HTsummary <- function(TEName,imageObj,vhicaObj,DivRate=-1,seuil=0.05){
   #Creating the Summary Final Comparison file
   Finalcomparison<-NULL
   #Getting the stats matrix from the imajeObj 
   upper_matriz<-imageObj$stats
   #Keeping only the upper matrix
   upper_matriz[lower.tri(upper_matriz)]<-NA 
+  upper_matriz <- 10^upper_matriz
   #Extracting the comparison which presented significant p-value 
-  significantfilterNumber<-subset(as.data.frame(as.table(upper_matriz)),Freq<(-1.3))
+  significantfilterNumber<-subset(as.data.frame(as.table(upper_matriz)),Freq<(seuil))
   if(dim(significantfilterNumber)[1]==0){
     return(NULL)
   }
@@ -34,7 +35,7 @@ vhica_HTsummary <- function(TEName,imageObj,vhicaObj,DivRate=-1){
     #Extracting specific p-values from comparison between species 1 and 2 for the TE given as argument in the function
     comparisonNumero<-subset(significantfilterNumber,((Var1==member1 | Var1==member2) & (Var2==member1 | Var2==member2) & Var1!=Var2))
     comparison<-subset(transposons,((sp1==member1 | sp1==member2) & (sp2==member1 | sp2==member2) & sp1!=sp2))
-    pvalor<-10^(comparisonNumero$Freq)
+    pvalor<-comparisonNumero$Freq
     #If no DivRate given no estimates in Mya
     if(DivRate==-1){
       comparison<-cbind(comparison,pvalor)
