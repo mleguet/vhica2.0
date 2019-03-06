@@ -23,7 +23,12 @@ function (x, sp1 = NULL, sp2 = NULL, ...)
                 stop("The cross between species ", species[sp1], 
                   " and ", species[sp2], " is not documented")
             }
-            .plot.regression(x$reg[[cross]], ...)
+            if (x$coding) {
+              .plot.regression(x$reg[[cross]], ...)
+            }
+            else{
+              .plot.density(x$reg[[cross]],...)
+            }
         }
     }
     par(op)
