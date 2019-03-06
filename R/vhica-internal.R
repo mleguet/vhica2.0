@@ -256,7 +256,7 @@ function (col.obj, main = "", p.adjust.method = "none", nslices = 1000,
 }
 .plot.matrix <-
 function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE), 
-    col.obj = .make.col.obj(n = 1000), na.col = "gray", grid.col = "darkgray", 
+    col.obj = .make.col.obj(n = 1000), na.col = "gray", grid.col = "darkgray", p.value.show= TRUE,
     ...) 
 {
 	if(sum(!is.na(pmatrix)) == 0)
@@ -276,6 +276,12 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
         cbreaks <- c(dummy.val, cbreaks)
         pmatrix[is.na(pmatrix)] <- dummy.val
     }
+    p.value <- 10^(t(pmatrix[nrow(pmatrix):1, ]))    
+    p.value[which(p.value == 0)] <- NA
+    p.value[which(p.value >= 1)] <- NA
+    p.value <- format(p.value, scientific=TRUE, digits=3 )
+    p.value[which(p.value =='      NA')] <-" "
+    
     image(x = realx, y = max(realx) - rev(realx) + 0.5, z = t(pmatrix[nrow(pmatrix):1, 
         ]), axes = FALSE, col = ccol, breaks = cbreaks, zlim = zlim, 
         ...)
@@ -289,6 +295,10 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
         las = 2, lwd.ticks = 0, lwd = 0, family = "mono")
     axis(3, at = 1:length(species), labels = names(species), 
         las = 2, lwd.ticks = 0, lwd = 0, family = "mono")
+    if (p.value.show) {
+       text(expand.grid(1:length(species), 1:length(species)), labels = p.value)
+    }
+   
 }
 .plot.phylo <-
 function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE, 
@@ -310,6 +320,31 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
             ...)
     }
 }
+.plot.density <-
+  function(reg,elements = rownames(reg[[length(reg)]]),pch.element = 2, col.element = "black", element.names = TRUE)
+  {
+    div=reg$model[, 1]
+    mode= density(div)$x[which.max(density(div)$y)]
+    normal=shapiro.test(div) # check the population normally distributed
+    plot(density(div),xlab='div', main='div density')
+    abline(v=mode, col='red')
+    abline(v=median(div), col='green' )
+    abline(v=mean(div), col='blue' )
+    legend("topleft", legend=c(
+    paste("mode =", round(mode,2)), 
+    paste("median =", round(median(div),2)), 
+    paste("mean =", round(mean(div),2))
+    ), col=c("red","green", "blue"), lty=1, cex=0.8)
+    rug(div, col="black", lwd=1, lty=3)
+    in.elements <- elements %in% rownames(reg[[length(reg)]])
+    if (element.names && sum(in.elements > 0)) {
+      rug(reg[[length(reg)]][elements, 2], col='red', lwd=3.5)
+      text(reg[[length(reg)]][elements, 2],0.2, labels = elements)
+    }
+    if (normal$p.value>0.05) { 
+      legend("topright", legend="normal distribution", cex=0.7,inset = 0.02, box.lty = 0)
+    }
+  }
 .plot.regression <-
 function (reg, xlim = range(c(reg$model[, 2], reg[[length(reg)]][, 
     1]), na.rm=TRUE), ylim = range(c(reg$model[, 1]), reg[[length(reg)]][, 
@@ -513,6 +548,7 @@ function (cbias, div, reference = "Gene", divergence = "dS",
     return(mymclapply(full.list, FUN = function(cross) {
         cross2 <- cross[cross$Type == reference, ]
         cross.TE <- cross[cross$Type != reference, ]
+        if (length(rownames(cross2))>0) {
         meanCB <- 0.5 * cross2$CB1 + 0.5 * cross2$CB2
         div <- cross2$div
         names(div) <- names(meanCB) <- rownames(cross2)
@@ -521,21 +557,22 @@ function (cbias, div, reference = "Gene", divergence = "dS",
         names(meanCB.TE) <- names(div.TE) <- rownames(cross.TE)
         ans <- NULL
         resid.TE <- NULL
-        if (CB.as.x) {
-            ans <- lm(div ~ meanCB)
-            resid.TE <- div.TE - (meanCB.TE * coef(ans)[2] + 
-                coef(ans)[1])
-            ans[[levels(cross$Type)[2]]] <- data.frame(meanCB = meanCB.TE, 
-                div = div.TE, resid = resid.TE, rel.res = resid.TE/sd(resid(ans)))
-        } else {
-            ans <- lm(meanCB ~ div)
-            resid.TE <- meanCB.TE - (div.TE * coef(ans)[2] + 
-                coef(ans)[1])
-            ans[[levels(cross$Type)[2]]] <- data.frame(div = div.TE, 
-                meanCB = meanCB.TE, resid = resid.TE, rel.res = resid.TE/sd(resid(ans)))
-        }
+          if (CB.as.x) {
+              ans <- lm(div ~ meanCB)
+              resid.TE <- div.TE - (meanCB.TE * coef(ans)[2] + 
+                  coef(ans)[1])
+              ans[[levels(cross$Type)[2]]] <- data.frame(meanCB = meanCB.TE, 
+                  div = div.TE, resid = resid.TE, rel.res = resid.TE/sd(resid(ans)),rel.div=(div.TE-mean(div))/sd(div))
+          } else {
+              ans <- lm(meanCB ~ div)
+              resid.TE <- meanCB.TE - (div.TE * coef(ans)[2] + 
+                  coef(ans)[1])
+              ans[[levels(cross$Type)[2]]] <- data.frame(div = div.TE, 
+                  meanCB = meanCB.TE, resid = resid.TE, rel.res = resid.TE/sd(resid(ans)),rel.div=(div.TE-mean(div))/sd(div))
+          }
         rownames(ans[[levels(cross$Type)[2]]]) <- rownames(cross.TE)
         return(ans)
+        }        
     }))
 }
 .reverse.sub <-
@@ -552,7 +589,7 @@ function (seqname, family.sep)
 }
 .stat.matrix <-
 function (vhica.obj, element, elements, p.adjust.method = "none", 
-    H1.test = "bilat") 
+    H1.test = "bilat",coding=TRUE) 
 {
     ans <- matrix(NA, ncol = length(elements), nrow = length(elements))
     colnames(ans) <- rownames(ans) <- elements
@@ -608,18 +645,23 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
                 }
             }
             if (linename %in% rownames(vhica.obj$reg[[crossname]]$TE)) {
-                norm.resid <- element.table[linename, "rel.res"]
                 pval <- NA
+                if (coding) {
+                  norm.val <- element.table[linename, "rel.res"]
+                }
+                else {
+                  norm.val <-element.table[linename, "rel.div"]
+                }
                 if (H1.test == "lower") {
-                  p.val <- pnorm(norm.resid)
+                  p.val <- pnorm(norm.val)
                 }
                 else if (H1.test == "bilat") {
-                  p.val <- 2 * pnorm(-abs(norm.resid))
-                  if (norm.resid > 0) 
+                  p.val <- 2 * pnorm(-abs(norm.val))
+                  if (norm.val > 0) 
 				      p.val <- -p.val
                 }
                 else if (H1.test == "greater") {
-                  p.val <- -pnorm(-norm.resid)
+                  p.val <- -pnorm(-norm.val)
                 }
                 else {
                   stop("H1.test ", H1.test, " incorrect. Should be \"lower\", \"bilat\", or \"greater\".")
@@ -683,10 +725,13 @@ function (cbias, div, check = TRUE, keep.absent = FALSE, warn = FALSE,
                 sp1 = sp1, sp2 = sp2, sub.div = sub.div))
             rownames(tt) <- tt$name
             tt$name <- NULL
-            if (!keep.absent) {
+            if ((!keep.absent)&(!is.null(tt))) {  
                 tt <- tt[!is.na(tt[, 4]), ]
-            }
+              if (length(rownames(tt))>0)
+                {
             ans[[cross]] <- tt
+	      }
+            }
         }
     }
     return(ans)
