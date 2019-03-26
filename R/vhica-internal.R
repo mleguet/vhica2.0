@@ -276,7 +276,7 @@ function (pmatrix, species, elements, zlim = range(pmatrix, na.rm = TRUE),
         cbreaks <- c(dummy.val, cbreaks)
         pmatrix[is.na(pmatrix)] <- dummy.val
     }
-    p.value <- 10^(t(pmatrix[nrow(pmatrix):1, ]))    
+    p.value <- 10^(t(pmatrix[nrow(pmatrix):1, ]))   
     p.value[which(p.value == 0)] <- NA
     p.value[which(p.value >= 1)] <- NA
     p.value <- format(p.value, scientific=TRUE, digits=3 )
@@ -325,7 +325,6 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
   {
     div=reg$model[, 1]
     mode= density(div)$x[which.max(density(div)$y)]
-    normal=shapiro.test(div) # check the population normally distributed
     plot(density(div),xlab='div', main='div density')
     abline(v=mode, col='red')
     abline(v=median(div), col='green' )
@@ -340,9 +339,6 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
     if (element.names && sum(in.elements > 0)) {
       rug(reg[[length(reg)]][elements, 2], col='red', lwd=3.5)
       text(reg[[length(reg)]][elements, 2],0.2, labels = elements)
-    }
-    if (normal$p.value>0.05) { 
-      legend("topright", legend="normal distribution", cex=0.7,inset = 0.02, box.lty = 0)
     }
   }
 .plot.regression <-
@@ -650,6 +646,13 @@ function (vhica.obj, element, elements, p.adjust.method = "none",
                   norm.val <- element.table[linename, "rel.res"]
                 }
                 else {
+                  # normal distribution ? 
+                  reg = vhica.obj$reg[[crossname]]
+                  div =reg$model[, 1]
+                  normal=shapiro.test(div)
+                 if(normal$p.value<0.05){
+                  stop("Impossible to calculate p-value, please check your orthologues genes")
+                  }
                   norm.val <-element.table[linename, "rel.div"]
                 }
                 if (H1.test == "lower") {
