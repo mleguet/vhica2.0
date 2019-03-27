@@ -1,4 +1,4 @@
-vhica_HTsummary <- function(TEName,imageObj,vhicaObj,DivRate=-1,seuil=0.05){
+HTsummary <- function(TEName,imageObj,vhicaObj,DivRate=-1,seuil=0.05){
   #Creating the Summary Final Comparison file
   Finalcomparison<-NULL
   #Getting the stats matrix from the imajeObj 
