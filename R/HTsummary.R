@@ -48,7 +48,8 @@ HTsummary <- function(TEName,imageObj,vhicaObj,DivRate=-1,seuil=0.05){
     }
     #Adding information in the final object
     Finalcomparison<-rbind(Finalcomparison,comparison) 
-    
+    row.names(Finalcomparison)<- NULL
+    write.csv(Finalcomparison, file = "Finalcomparison.csv",row.names=FALSE) 
   }
   return(Finalcomparison)
 }
