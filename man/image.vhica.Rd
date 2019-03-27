@@ -9,10 +9,11 @@ Consistency matrix for a transposable element in the VHICA analysis.
 This function plots a composite figure summarizing the evolutionary properties of a transposable element in a group of related species. Discrepancies may indicate horizontal transfers. 
 }
 \usage{
-\method{image}{vhica}(x, element = "", H1.test = "bilat", treefile = NULL, 
-skip.void = FALSE, species = NULL, p.threshold = 0.05, 
-p.adjust.method = "bonferroni",  ncolors = 1024, 
-main = element, threshcol=0.1, colsqueeze=1, ...)
+\method{image}{vhica}(x, element = "", H1.test = "lower", treefile = NULL, 
+skip.void = FALSE, species = NULL, p.threshold = 0.05,
+p.adjust.method = "bonferroni", ncolors = 1024, main =
+element, threshcol = 0.1, colsqueeze = 1, p.value.show
+= TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -51,6 +52,9 @@ main = element, threshcol=0.1, colsqueeze=1, ...)
 }
  \item{colsqueeze}{
 	Values larger than 1 shrink the color gradient around the threshold.
+}
+ \item{p.value.show}{
+	Show the p.value in image. 
 }
   \item{\dots}{
 	Further arguments to the generic function \code{\link{image}}. 
