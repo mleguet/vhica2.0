@@ -15,7 +15,8 @@ read.vhica(gene.fasta=NULL, target.fasta=NULL,
 	cb.filename=NULL, div.filename=NULL, 
 	reference = "Gene", divergence = "dS", 
 	CUB.method="ENC", div.method="LWL85", div.pairwise=TRUE, 
-	div.max.lim=3, species.sep="_", gene.sep=".", family.sep=".", ...)
+	div.max.lim=3, species.sep="_", gene.sep=".", family.sep=".",
+	coding = TRUE, ...)
 }
 
 \arguments{
@@ -49,6 +50,8 @@ read.vhica(gene.fasta=NULL, target.fasta=NULL,
     Separator for gene names from gene sequence files.}
   \item{family.sep}{
 	Separator for target sequence sub-families.}
+	\item{coding}{
+	Allows you to choose the method used. If the TE are Autonomous it is necessary to use True, if it's nonautonomous it is necessary to use False}
   \item{\dots}{
 	Further parameters for the internal function \code{.reference.regression}.}
 }
@@ -103,6 +106,7 @@ CG2214  0.10    Dmel    Dsim
 		\item{target:} {The sequence type that is not the reference}
 		\item{divergence:} {The \code{divergence} option}
 		\item{family.sep:} {The character used to indicate TE sub-families}
+		\item{coding} {changes the method of detection of TEs }
 	}
 }
 
