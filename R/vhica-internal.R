@@ -506,17 +506,17 @@ function(gene.fasta, target.fasta, method="ENC", ref.name="Gene", targ.name="TE"
 	return(rbind(ans.genes, ans.targ))
 }
 .seq.divergence <-
-function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, species.sep="_", gene.sep=".", family.sep=".", max.lim=3)
+function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, species.sep="_", gene.sep=".", family.sep=".", max.lim=3,coding=TRUE)
 {
     if (requireNamespace("parallel", quietly=TRUE)) {
 		mymclapply <- parallel::mclapply
 	} else {
         mymclapply <- lapply
     }	
-	listseq <- mymclapply(sequence.fasta, function(genefile) {
-		ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
-		names(ans)[which(names(ans)=="div")] <- divergence
-		seqn <- rep(.remove.space(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1]), nrow(ans))
+  listseq <- mymclapply(sequence.fasta, function(genefile) {
+    ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
+    names(ans)[which(names(ans)=="div")] <- divergence
+    seqn <- rep(.remove.space(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1]), nrow(ans))
 		
 		fullsp1 <- .get.TE.fam.longseq(as.character(ans$sp1), species.sep=species.sep, family.sep=family.sep)
 		fullsp2 <- .get.TE.fam.longseq(as.character(ans$sp2), species.sep=species.sep, family.sep=family.sep)
@@ -760,6 +760,21 @@ function(seq, gene.name="") {
 	}
 	return(seq)
 }
+.checkseq2 <-
+  function(seq, gene.name="") {
+    # 0 check if the object makes sense
+    stopifnot(
+      length(seq) > 0,
+      is.list(seq),
+      class(seq)=="DNAbin")
+    # 1 check if all sequences have the same size
+    ll <- sapply(seq, length)
+    if (max(ll) != min(ll)) {
+      warning(gene.name, " Sequences do not have the same length. Adding as many n as necessary.")
+      seq <- lapply(seq, function(s) {ans <- c(s, rep("n", max(ll)-length(s))); class(ans) <- "SeqFastadna"; ans})
+    }
+    return(seq)
+  }
 .ENC <-
 function(seq, numcode=1, Wright.corr=TRUE) 
 {
@@ -805,3 +820,24 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.l
 			}))
 	}
 }
+
+.K2P <-
+  function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE)
+  {
+    stopifnot(
+      class(seq)=="DNAbin",
+      length(sq1) == length(sq2),
+      all(c(sq1,sq2) %in% names(seq)),
+      requireNamespace("ape"))
+    if (!pairwise) {
+      k2P <- as.matrix(dist.dna(seq))
+      candidate <- k2P[cbind(sq1, sq2)]
+      return(ifelse (is.na(candidate) , NA, candidate))
+    } else {
+      return(sapply(1:length(sq1), function(i) {
+        subseq <- seq[c(sq1[i], sq2[i])]
+        candidate <- dist.dna(subseq)
+        return(if(is.na(candidate)) NA else candidate)
+      }))
+    }
+  }
