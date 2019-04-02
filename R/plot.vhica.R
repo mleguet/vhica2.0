@@ -24,10 +24,10 @@ function (x, sp1 = NULL, sp2 = NULL, ...)
                   " and ", species[sp2], " is not documented")
             }
             if (x$coding) {
-              .plot.regression(x$reg[[cross]], ...)
+              .plot.regression(x$reg[[cross]],divergence=x$divergence, ...)
             }
             else{
-              .plot.density(x$reg[[cross]],...)
+              .plot.density(x$reg[[cross]],divergence=x$divergence, ...)
             }
         }
     }
