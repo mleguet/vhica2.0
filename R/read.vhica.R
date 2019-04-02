@@ -10,7 +10,7 @@ function (gene.fasta=NULL, target.fasta=NULL, cb.filename=NULL, div.filename=NUL
 		vhica.obj$cbias <- 
 			.seq.codon.bias(gene.fasta=gene.fasta, target.fasta=target.fasta, method=CUB.method, species.sep=species.sep, family.sep=family.sep)
 		vhica.obj$div <- 
-			.seq.divergence(sequence.fasta=c(gene.fasta, target.fasta), method=div.method, pairwise=div.pairwise, max.lim=div.max.lim, species.sep=species.sep, family.sep=family.sep)
+			.seq.divergence(sequence.fasta=c(gene.fasta, target.fasta), method=div.method, pairwise=div.pairwise, max.lim=div.max.lim, species.sep=species.sep, family.sep=family.sep,coding=coding)
 		if (!is.null(cb.filename))
 			write.table(vhica.obj$cbias, file=cb.filename, sep="\t", quote=FALSE, row.names=TRUE)
 		if (!is.null(div.filename)) 
