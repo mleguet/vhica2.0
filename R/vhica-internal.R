@@ -321,11 +321,11 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
     }
 }
 .plot.density <-
-  function(reg,elements = rownames(reg[[length(reg)]]),pch.element = 2, col.element = "black", element.names = TRUE)
+  function(reg, divergence='dS', elements = rownames(reg[[length(reg)]]),pch.element = 2, col.element = "black", element.names = TRUE)
   {
     div=reg$model[, 1]
     mode= density(div)$x[which.max(density(div)$y)]
-    plot(density(div),xlab='div (K2P)', main='div density')
+    plot(density(div),xlab=paste0("div (",divergence,")"), main='div density')
     abline(v=mode, col='red')
     abline(v=median(div), col='green' )
     abline(v=mean(div), col='blue' )
@@ -342,9 +342,9 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
     }
   }
 .plot.regression <-
-function (reg, xlim = range(c(reg$model[, 2], reg[[length(reg)]][, 
+function (reg, divergence='dS', xlim = range(c(reg$model[, 2], reg[[length(reg)]][, 
     1]), na.rm=TRUE), ylim = range(c(reg$model[, 1]), reg[[length(reg)]][, 
-    2], na.rm=TRUE), xlab = names(reg$model)[2], ylab = names(reg$model)[1], 
+    2], na.rm=TRUE), xlab = names(reg$model)[2], ylab = paste0("div (",divergence,")"), 
     reg.line = TRUE, elements = rownames(reg[[length(reg)]]), 
     pch.gene = 1, pch.element = 2, col.gene = "black", col.element = "black", 
     element.names = TRUE, lty.reg = 2, col.reg = "black", pval = NA, 
