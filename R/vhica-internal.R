@@ -325,7 +325,7 @@ function (tree, species = "", horizontal = FALSE, show.tip.label = FALSE,
   {
     div=reg$model[, 1]
     mode= density(div)$x[which.max(density(div)$y)]
-    plot(density(div),xlab='div', main='div density')
+    plot(density(div),xlab='div (K2P)', main='div density')
     abline(v=mode, col='red')
     abline(v=median(div), col='green' )
     abline(v=mean(div), col='blue' )
@@ -512,11 +512,11 @@ function(sequence.fasta, divergence="dS", method="LWL85", pairwise=FALSE, specie
 		mymclapply <- parallel::mclapply
 	} else {
         mymclapply <- lapply
-    }	
-  listseq <- mymclapply(sequence.fasta, function(genefile) {
-    ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
-    names(ans)[which(names(ans)=="div")] <- divergence
-    seqn <- rep(.remove.space(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1]), nrow(ans))
+	}
+	listseq <- mymclapply(sequence.fasta, function(genefile) {
+	    ans <- div(genefile, method=method, pairwise=pairwise, max.lim=max.lim)
+	    names(ans)[which(names(ans)=="div")] <- divergence
+		seqn <- rep(.remove.space(strsplit(basename(genefile), split=gene.sep, fixed=TRUE)[[1]][1]), nrow(ans))
 		
 		fullsp1 <- .get.TE.fam.longseq(as.character(ans$sp1), species.sep=species.sep, family.sep=family.sep)
 		fullsp2 <- .get.TE.fam.longseq(as.character(ans$sp2), species.sep=species.sep, family.sep=family.sep)
