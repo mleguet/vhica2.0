@@ -6,11 +6,15 @@ function (gene.fasta=NULL, target.fasta=NULL, cb.filename=NULL, div.filename=NUL
 		!(is.null(gene.fasta) && is.null(target.fasta)) || 
 		!(is.null(cb.filename) && is.null(div.filename)))
     vhica.obj <- list()
+    if(!coding){
+      div.method='K2P'
+      divergence='K2P'
+    }
     if (!is.null(gene.fasta)) {
 		vhica.obj$cbias <- 
 			.seq.codon.bias(gene.fasta=gene.fasta, target.fasta=target.fasta, method=CUB.method, species.sep=species.sep, family.sep=family.sep)
 		vhica.obj$div <- 
-			.seq.divergence(sequence.fasta=c(gene.fasta, target.fasta), method=div.method, pairwise=div.pairwise, max.lim=div.max.lim, species.sep=species.sep, family.sep=family.sep,coding=coding)
+			.seq.divergence(sequence.fasta=c(gene.fasta, target.fasta),divergence=divergence, method=div.method, pairwise=div.pairwise, max.lim=div.max.lim, species.sep=species.sep, family.sep=family.sep)
 		if (!is.null(cb.filename))
 			write.table(vhica.obj$cbias, file=cb.filename, sep="\t", quote=FALSE, row.names=TRUE)
 		if (!is.null(div.filename)) 
