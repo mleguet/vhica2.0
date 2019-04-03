@@ -3,7 +3,7 @@ div <- function
 {
 	stopifnot(
 		!(is.null(file) && is.null(sequence)),
-		method[1] %in% c("LWL85","K2P"),
+		method[1] %in% c("LWL85","JC69","K80","F81","K81","F84","BH87","T92","TN93","GG95"),
 		requireNamespace("gtools", quietly=TRUE))
 
 	if (!is.null(file)) {
@@ -16,14 +16,14 @@ div <- function
 	  if (method[1]=="LWL85") {
 	    sequence <- seqinr::read.fasta(file)
 	  }
-	  if (method[1]=="K2P") {
+	  else {
 	  sequence=read.FASTA(file, type = "DNA")
 		}
 	}
   if (method[1]=="LWL85") {
     sequence <- .checkseq(sequence, gene.name=if (is.null(file)) "" else file)
   }
-  if (method[1]=="K2P") {
+  else {
     sequence <- .checkseq2(sequence, gene.name=if (is.null(file)) "" else file)
   }
 	if (is.null(sqs)) {
@@ -33,8 +33,8 @@ div <- function
 	if (method[1]=="LWL85") {
 		return(data.frame(div=.LWL85(sequence, combn[,1], combn[,2], pairwise=pairwise, max.lim=max.lim), sp1=combn[,1], sp2=combn[,2]))
 	} 
-	if (method[1]=="K2P") {
-	  return(data.frame(div=.K2P(sequence, combn[,1], combn[,2], pairwise=pairwise), sp1=combn[,1], sp2=combn[,2]))
+	else {
+	  return(data.frame(div=.cal_div(sequence, combn[,1], combn[,2], pairwise=pairwise, method=method), sp1=combn[,1], sp2=combn[,2]))
 	} 
 	stop("Method ", method, " unknown.") # This should never happen
 }
