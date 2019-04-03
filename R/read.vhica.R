@@ -6,9 +6,11 @@ function (gene.fasta=NULL, target.fasta=NULL, cb.filename=NULL, div.filename=NUL
 		!(is.null(gene.fasta) && is.null(target.fasta)) || 
 		!(is.null(cb.filename) && is.null(div.filename)))
     vhica.obj <- list()
-    if(!coding){
-      div.method='K2P'
-      divergence='K2P'
+    if((!coding) & (divergence=="dS")){
+      divergence='K80'
+    }
+    if(!coding ||(divergence != "dS") ){
+      div.method=divergence
     }
     if (!is.null(gene.fasta)) {
 		vhica.obj$cbias <- 
