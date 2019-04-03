@@ -821,8 +821,8 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.l
 	}
 }
 
-.K2P <-
-  function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE)
+.cal_div <-
+  function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, method="K80")
   {
     stopifnot(
       class(seq)=="DNAbin",
@@ -830,13 +830,13 @@ function(seq, sq1=names(seq)[1], sq2=names(seq)[2], pairwise=TRUE, max.lim=max.l
       all(c(sq1,sq2) %in% names(seq)),
       requireNamespace("ape"))
     if (!pairwise) {
-      k2P <- as.matrix(dist.dna(seq))
-      candidate <- k2P[cbind(sq1, sq2)]
+      div <- as.matrix(dist.dna(x=seq, model = method))
+      candidate <- div[cbind(sq1, sq2)]
       return(ifelse (is.na(candidate) , NA, candidate))
     } else {
       return(sapply(1:length(sq1), function(i) {
         subseq <- seq[c(sq1[i], sq2[i])]
-        candidate <- dist.dna(subseq)
+        candidate <- dist.dna(x=subseq, model = method)
         return(if(is.na(candidate)) NA else candidate)
       }))
     }
